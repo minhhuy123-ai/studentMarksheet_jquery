@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+      tr {
+        transition: all 0.25s ease-in-out;
+      }
+      tr:hover {
+        background-color: #eee;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+          <h2 class="text-center"><strong>Class Marksheet</strong> <br /></h2>
+          <div class="form-group row">
+            <label for="name" class="col-sm-4 col-form-label">Họ tên</label>
+            <div class="col-sm-8">
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                placeholder="Họ tên"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="mathPoint" class="col-sm-4 col-form-label"
+              >Điểm Toán</label
+            >
+            <div class="col-sm-8">
+              <input
+                type="number"
+                class="form-control"
+                id="mathPoint"
+                placeholder="Điểm Toán"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="physicPoint" class="col-sm-4 col-form-label"
+              >Điểm Lý</label
+            >
+            <div class="col-sm-8">
+              <input
+                type="number"
+                class="form-control"
+                id="physicPoint"
+                placeholder="Điểm Lý"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="chemicPoint" class="col-sm-4 col-form-label"
+              >Điểm Hóa</label
+            >
+            <div class="col-sm-8">
+              <input
+                type="number"
+                class="form-control"
+                id="chemicPoint"
+                placeholder="Điểm Hóa"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-4">
+              <button id="btnAdd" type="button" class="btn btn-primary">
+                Thêm
+              </button>
+            </div>
+            <div class="col-sm-4">
+              <button id="btnEdit" type="button" class="btn btn-warning">
+                Sửa
+              </button>
+            </div>
+            <div class="col-sm-4">
+              <button id="btnRemove" type="button" class="btn btn-danger">
+                Xóa
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4"></div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Họ tên</th>
+              <th>Toán</th>
+              <th>Lý</th>
+              <th>Hóa</th>
+              <th>Trung bình</th>
+            </tr>
+          </thead>
+          <tbody id="myTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+          <div class="col-sm-6">
+            <button type="button" class="btn btn-primary" id="btnCalculate">
+              Tính điểm trung bình
+            </button>
+          </div>
+          <div class="col-sm-6">
+            <button type="button" class="btn btn-primary" id="btnEvaluate">
+              Xác định học sinh giỏi
+            </button>
+          </div>
+        </div>
+        <div class="col-md-4"></div>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function () {
+        var studentList = [];
+
+        var table = $("#myTable");
+        var fullname = $("#name");
+        var math = $("#mathPoint");
+        var physical = $("#physicPoint");
+        var chemistry = $("#chemicPoint");
+
+        var sum = 0;
+        var average = 0;
+
+        //tao biến để lưu index của tr được select
+        var rIndex = 0;
+
+        $("#btnAdd").click(function () {
+          //tạo đối tượng trong mảng danh sách sinh viên và lưu giá trị
+          if (!checkEmptyInput()) {
+            studentList[studentList.length] = {
+              name: fullname.val(),
+              math: math.val(),
+              physical: physical.val(),
+              chemistry: chemistry.val(),
+            };
+            
+            //render thông tin ra bảng
+            table.append(`<tr>
+              <td>${studentList.length}</td>
+              <td>${fullname.val()}</td>
+              <td>${math.val()}</td>
+              <td>${physical.val()}</td>
+              <td>${chemistry.val()}</td>
+              <td>?</td>
+            </tr>`);
+
+            //Xóa các giá trị đã nhập trong form input
+            fullname.val("");
+            math.val("");
+            physical.val("");
+            chemistry.val("");
+
+            selectedRow();
+          }
+        });
+
+        selectedRow();
+
+        //Tính điểm trung bình
+        $("#btnCalculate").click(function () {
+          for (let i = 0; i < studentList.length; i++) {
+            sum =
+              parseFloat(studentList[i].math) +
+              parseFloat(studentList[i].physical) +
+              parseFloat(studentList[i].chemistry);
+            average = (sum / 3).toFixed(1);
+            console.log(average);
+            table.children("tr").eq(i).children("td").eq(5).html(average);
+          }
+        });
+
+        //Xác định học sinh giỏi
+        $("#btnEvaluate").click(function () {
+          for (let i = 0; i < studentList.length; i++) {
+            if (
+              parseFloat(
+                table.children("tr").eq(i).children("td").eq(5).html()
+              ) >= 8.0
+            ) {
+              table.children("tr").eq(i).css({ color: "red" });
+            }
+          }
+        });
+
+        //sau khi click vào hàng cần sửa, những thông tin trên row tự động hiển thị trên form input
+        //lúc này người dùng có thể sửa thông tin ngay trên form input này
+        //rồi click button Sửa thì thông tin trên row được chọn sẽ được cập nhập mới theo thông tin đã nhập trên form input
+        //tuy nhiên trong lúc sửa vô tình để 1 ô input bị trống mà bấm nút sửa sẽ hiển thị thông báo lỗi
+
+        $("#btnEdit").click(function () {
+          if (!checkEmptyInput()) {
+            //cập nhật thông tin mới vào bảng
+
+            //phần tên
+            table
+              .children("tr")
+              .eq(rIndex - 1)
+              .children("td")
+              .eq(1)
+              .html(fullname.val());
+            //phần điểm Toán
+            table
+              .children("tr")
+              .eq(rIndex - 1)
+              .children("td")
+              .eq(2)
+              .html(math.val());
+            //phần điểm Lý
+            table
+              .children("tr")
+              .eq(rIndex - 1)
+              .children("td")
+              .eq(3)
+              .html(physical.val());
+            //phần điểm Hóa
+            table
+              .children("tr")
+              .eq(rIndex - 1)
+              .children("td")
+              .eq(4)
+              .html(chemistry.val());
+
+            //cập nhật mới thông tin thay đổi vào studentList
+            studentList[rIndex - 1].name = fullname.val();
+            studentList[rIndex - 1].math = math.val();
+            studentList[rIndex - 1].physical = physical.val();
+            studentList[rIndex - 1].chemistry = chemistry.val();
+
+            //xóa các trường trong input
+            fullname.val("");
+            math.val("");
+            physical.val("");
+            chemistry.val("");
+          }
+        });
+
+        //Muốn xóa hàng đầu tiên click vào hàng muốn xóa sau đó click nút Xóa
+        $("#btnRemove").click(function () {
+          var option = confirm("Bạn có chắc chắn muốn xóa không?");
+          if (!option) {
+            return;
+          }
+          //xóa các trường trong input
+          fullname.val("");
+          math.val("");
+          physical.val("");
+          chemistry.val("");
+          //Xóa đối tượng testScore tương ứng
+          studentList.splice(rIndex - 1, 1);
+          //in mảng studentList lên html
+          showData();
+        });
+
+        function showData() {
+          //xoa toan bo thong tin trong bang hien tai
+          table.empty();
+          //hien thị lai thong tin diem sinh vien
+          for (let i = 0; i < studentList.length; i++) {
+            table.append(`<tr>
+              <td>${i + 1}</td>
+              <td>${studentList[i].name}</td>
+              <td>${studentList[i].math}</td>
+              <td>${studentList[i].physical}</td>
+              <td>${studentList[i].chemistry}</td>
+              <td>?</td>
+            </tr>`);
+          }
+        }
+
+        //tạo hàm lưu index của <tr> được chọn
+        function selectedRow() {
+          $("#myTable > tr").click(function () {
+            rIndex = this.rowIndex;
+            console.log(rIndex);
+
+            //set giá trị của các row được select lên form input
+            fullname.val(studentList[rIndex - 1].name);
+            math.val(studentList[rIndex - 1].math);
+            physical.val(studentList[rIndex - 1].physical);
+            chemistry.val(studentList[rIndex - 1].chemistry);
+          });
+        }
+
+        //Kiểm tra các trường đã nhập đầy đủ
+        function checkEmptyInput() {
+          var isEmpty = false;
+          if (fullname.val() === "") {
+            alert("Vui lòng nhập tên");
+            isEmpty = true;
+          } else if (math.val() === "") {
+            alert("Vui lòng nhập điểm Toán");
+            isEmpty = true;
+          } else if (physical.val() === "") {
+            alert("Vui lòng nhập điểm Lý");
+            isEmpty = true;
+          } else if (chemistry.val() === "") {
+            alert("Vui lòng nhập điểm Hóa");
+            isEmpty = true;
+          }
+          return isEmpty;
+        }
+
+      });
+
+    </script>
+  </body>
+</html>
